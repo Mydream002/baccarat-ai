@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080b18">
+  <meta name="description" content="Baccarat AI GPT - PWA dashboard สำหรับบันทึกและวิเคราะห์สถิติ">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <title>Baccarat AI GPT</title>
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#050814;color:#e9ecff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+    .app{max-width:760px;margin:auto;padding:10px 10px 82px}
+    .top{display:flex;align-items:center;gap:12px;padding:12px 8px}
+    .logo{font-size:24px;font-weight:800;line-height:1.05;background:linear-gradient(90deg,#c65cff,#4e8cff);-webkit-background-clip:text;color:transparent}
+    .switch{margin-left:auto;background:#063c2a;border:1px solid #0a8d5d;color:#7dffbd;border-radius:30px;padding:8px 14px}
+    .card{border:1px solid #273153;background:linear-gradient(145deg,#0a0f20,#070b16);border-radius:12px;padding:14px;margin:8px 0;box-shadow:0 0 20px #0008}
+    h2{font-size:17px;margin:0 0 10px;color:#d58aff}.muted{color:#9ba3c6;font-size:13px}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.metric b{display:block;font-size:20px;margin-top:4px}
+    .results{display:flex;gap:8px;overflow-x:auto;padding-bottom:3px}.ball{min-width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800}
+    .B{background:#a91f27}.P{background:#1450a8}.T{background:#16833d}
+    .buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.btn{border:0;border-radius:8px;color:white;font-weight:800;padding:14px;font-size:15px}.btn.B{background:#b82028}.btn.P{background:#1557b5}.btn.T{background:#13823d}
+    .ai{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}.recommend{text-align:center;font-size:30px;font-weight:900;color:#ff3d42}.confidence{text-align:center;font-size:40px;color:#31df63;font-weight:800}
+    .reasons{line-height:1.8;font-size:14px}.reasons div:before{content:"✓";color:#32df63;margin-right:8px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;text-align:center}.stat{border:1px solid #273153;border-radius:9px;padding:9px}.stat b{display:block;font-size:22px}
+    .road{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid{height:95px;border:1px solid #273153;border-radius:8px;padding:7px;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(4,1fr);gap:3px}
+    .dot{width:13px;height:13px;border-radius:50%;border:2px solid currentColor;align-self:center;justify-self:center}
+    .money{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.money input{width:100%;padding:10px;border-radius:7px;border:1px solid #273153;background:#070b16;color:#fff}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:7px 4px;border-bottom:1px solid #222b45;text-align:center}
+    .win{color:#32df63}.loss{color:#ff414b}
+    nav{position:fixed;bottom:0;left:0;right:0;background:#080c1aee;border-top:1px solid #293253;display:flex;justify-content:center;z-index:5}
+    nav button{background:none;border:0;color:#aab1d0;padding:12px 16px;font-size:11px}nav button.active{color:#ce6cff}
+    .install{display:none;background:#7d31d9;border:0;color:#fff;padding:10px 14px;border-radius:8px;font-weight:700}
+    @media(max-width:520px){.ai{grid-template-columns:1fr}.road{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.logo{font-size:21px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="logo">BACCARAT<br>AI GPT<div class="muted">v1.0.0</div></div>
+    <button id="install" class="install">ติดตั้งแอป</button>
+    <div class="switch">โหมด AI อัตโนมัติ ●</div>
+  </div>
+
+  <section class="card">
+    <div class="metrics">
+      <div class="metric"><span class="muted">เวลา</span><b id="clock">--:--:--</b></div>
+      <div class="metric"><span class="muted">ไม้ที่เล่น</span><b id="count">0</b></div>
+      <div class="metric"><span class="muted">กำไร/ขาดทุน</span><b class="win" id="profit">0.00</b></div>
+    </div>
+  </section>
+
+  <section class="card"><h2>ผลลัพธ์ล่าสุด</h2><div id="results" class="results"></div></section>
+
+  <section class="card"><h2>บันทึกผล</h2><div class="buttons">
+    <button class="btn B" onclick="addResult('B')">BANKER<br>B</button>
+    <button class="btn P" onclick="addResult('P')">PLAYER<br>P</button>
+    <button class="btn T" onclick="addResult('T')">TIE<br>T</button>
+  </div></section>
+
+  <section class="card">
+    <h2>AI วิเคราะห์ <span class="muted">(จากสถิติที่บันทึก)</span></h2>
+    <div class="ai"><div><div class="recommend" id="recommend">BANKER</div><div class="confidence" id="confidence">50%</div><div class="muted" style="text-align:center">คะแนนสถิติ</div></div>
+      <div class="reasons"><div>สรุปจากผลที่บันทึกในเครื่อง</div><div>ใช้เพื่อดูสถิติ ไม่รับประกันผล</div><div>อัปเดตทุกครั้งที่กดบันทึก</div></div>
+    </div>
+  </section>
+
+  <section class="card"><h2>สถิติรวม</h2><div class="stats">
+    <div class="stat">Banker<b style="color:#ff3b42" id="bs">0%</b><span class="muted" id="bc">(0 ครั้ง)</span></div>
+    <div class="stat">Player<b style="color:#3488ff" id="ps">0%</b><span class="muted" id="pc">(0 ครั้ง)</span></div>
+    <div class="stat">Tie<b style="color:#35df63" id="ts">0%</b><span class="muted" id="tc">(0 ครั้ง)</span></div>
+    <div class="stat">ทั้งหมด<b id="total">0</b><span class="muted">ครั้ง</span></div>
+  </div></section>
+
+  <section class="card"><h2>Road Map</h2><div class="road"><div><div class="muted">Big Road</div><div id="bigroad" class="grid"></div></div><div><div class="muted">Bead Plate</div><div id="bead" class="grid"></div></div></div></section>
+
+  <section class="card"><h2>การจัดการเงิน</h2><div class="money">
+    <label class="muted">เงินทุนเริ่มต้น<input id="bankroll" type="number" value="50000"></label>
+    <label class="muted">เดิมพันต่อไม้<input id="bet" type="number" value="1000"></label>
+    <label class="muted">เป้าหมายกำไร<input id="target" type="number" value="10000"></label>
+    <label class="muted">หยุดขาดทุน<input id="stop" type="number" value="-5000"></label>
+  </div><button onclick="resetData()" style="margin-top:10px;width:100%;padding:11px;border-radius:8px;background:#273153;color:#fff;border:1px solid #3a466e">รีเซ็ตข้อมูล</button></section>
+
+  <section class="card"><h2>ประวัติผล</h2><div style="overflow:auto"><table><thead><tr><th>เวลา</th><th>ไม้</th><th>ผล</th></tr></thead><tbody id="history"></tbody></table></div></section>
+</div>
+<nav><button class="active">⌂<br>หน้าหลัก</button><button>◷<br>บันทึกผล</button><button>▥<br>สถิติ</button><button>♧<br>AI วิเคราะห์</button><button>⚙<br>ตั้งค่า</button></nav>
+<script>
+const KEY='baccarat_pwa_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'{"results":[],"history":[]}');
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function addResult(r){data.results.push(r);data.history.push({r,time:new Date().toLocaleTimeString('th-TH')});if(data.results.length>200)data.results.shift();if(data.history.length>50)data.history.shift();save()}
+function resetData(){if(confirm('ล้างผลและประวัติทั้งหมด?')){data={results:[],history:[]};save()}}
+function pct(n,t){return t?Math.round(n/t*100):0}
+function render(){
+ let a=data.results, t=a.length,b=a.filter(x=>x==='B').length,p=a.filter(x=>x==='P').length,ti=a.filter(x=>x==='T').length;
+ document.getElementById('count').textContent=t;document.getElementById('total').textContent=t;
+ document.getElementById('bs').textContent=pct(b,t)+'%';document.getElementById('ps').textContent=pct(p,t)+'%';document.getElementById('ts').textContent=pct(ti,t)+'%';
+ document.getElementById('bc').textContent='('+b+' ครั้ง)';document.getElementById('pc').textContent='('+p+' ครั้ง)';document.getElementById('tc').textContent='('+ti+' ครั้ง)';
+ document.getElementById('results').innerHTML=a.slice(-20).map(x=>`<span class="ball ${x}">${x}</span>`).join('');
+ let rec=b>=p?'BANKER':'PLAYER', score=t?Math.max(b,p)/t:0.5;
+ document.getElementById('recommend').textContent=rec;document.getElementById('confidence').textContent=Math.round(score*100)+'%';
+ document.getElementById('history').innerHTML=[...data.history].reverse().map((h,i)=>`<tr><td>${h.time}</td><td>${t-i}</td><td class="${h.r==='T'?'':'win'}">${h.r}</td></tr>`).join('');
+ drawGrid('bigroad',a);drawGrid('bead',a.slice(-48));
+}
+function drawGrid(id,a){let el=document.getElementById(id);el.innerHTML='';for(let i=0;i<48;i++){let d=document.createElement('span');d.className='dot '+(a[i]||'');if(a[i])d.style.color=a[i]==='B'?'#ff414b':a[i]==='P'?'#3d8dff':'#35df63';el.appendChild(d)}}
+setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('th-TH'),1000);render();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+let deferred;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;document.getElementById('install').style.display='block'});
+document.getElementById('install').onclick=async()=>{if(deferred){deferred.prompt();await deferred.userChoice;deferred=null}};
+</script>
+</body></html>
