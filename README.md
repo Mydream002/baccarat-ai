@@ -1,6 +1,7 @@
-# Baccarat AI GPT V10 PRO
-อัปโหลดไฟล์ทั้งหมดนี้เข้า GitHub Pages โดยแทนที่ index.html, manifest.json และ sw.js
+# Baccarat AI GPT V10.1 PRO — ONE PAGE
 
-ฟีเจอร์: Pattern Detection, Trend/Chop/Alternating regime, AI Ensemble score, Backtest, Monte Carlo simulation, P/L curve, B/P/T distribution, session counter, bankroll/risk controls, Stop Loss/Take Profit alert, JSON/CSV export, JSON import, PWA/offline cache.
+เวอร์ชันนี้รวม Home, Record, Stats, AI และ Settings ให้อยู่ในหน้าเดียว สามารถเลื่อนดูทุกส่วนได้ทันที
 
-หมายเหตุ: ระบบใช้เพื่อบันทึก/วิเคราะห์/จำลองสถิติเท่านั้น ไม่รับประกันผลหรือกำไรจากบาคาร่า
+ฟีเจอร์: Smart NO-SIGNAL, Pattern, Regime, Monte Carlo, Session Analytics, Backtest, P/L, Risk, Export/Import และ PWA Offline
+
+หมายเหตุ: ใช้เพื่อบันทึก/วิเคราะห์สถิติและจำลองความเสี่ยงเท่านั้น ไม่รับประกันผลหรือกำไร
