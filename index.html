@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071126">
+<link rel="manifest" href="manifest.json">
+<title>Baccarat AI GPT V9</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#050817;color:#eef3ff}
+.wrap{max-width:980px;margin:auto;padding:14px}.hero{background:linear-gradient(135deg,#101c45,#17265c);border:1px solid #33457d;border-radius:22px;padding:18px;box-shadow:0 12px 35px #0008}
+h1{margin:0;font-size:25px}.sub{opacity:.7;font-size:12px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.card{background:#0c1430;border:1px solid #25345f;border-radius:16px;padding:12px}.label{font-size:11px;opacity:.65}.value{font-size:22px;font-weight:800;margin-top:3px}.pos{color:#5ee89a}.neg{color:#ff6f7c}
+section{margin-top:12px}.title{font-weight:800;margin-bottom:8px}.road{display:flex;flex-wrap:wrap;gap:6px}.ball{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px}.B{background:#b92d4c}.P{background:#2869d8}.T{background:#16a875}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.btn{border:0;border-radius:14px;padding:14px;color:white;font-weight:800;background:#182650}.btn:hover{filter:brightness(1.15)}.b{background:#b92d4c}.p{background:#2869d8}.t{background:#159c6e}.warn{background:#765c16}.danger{background:#6e2030}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.signal{font-size:28px;font-weight:900}.meter{height:9px;background:#1b2545;border-radius:20px;overflow:hidden;margin:8px 0}.fill{height:100%;background:#67a6ff;width:0}.row{display:flex;justify-content:space-between;gap:8px;margin:6px 0;font-size:13px}
+input,select{width:100%;padding:11px;border-radius:11px;border:1px solid #33446f;background:#080f26;color:white}.settings{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.small{font-size:11px;opacity:.65}.footer{text-align:center;opacity:.45;padding:16px;font-size:11px}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.settings{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body><div class="wrap">
+<div class="hero"><h1>🤖 BACCARAT AI GPT</h1><div class="sub">V9.0 • PRO MAX SESSION ANALYTICS • สถิติเท่านั้น ไม่รับประกันผล</div>
+<div class="grid"><div class="card"><div class="label">ทุนปัจจุบัน</div><div id="bank" class="value">1,000.00</div></div>
+<div class="card"><div class="label">กำไร/ขาดทุน</div><div id="pl" class="value">0.00</div></div>
+<div class="card"><div class="label">Win Rate</div><div id="wr" class="value">0%</div></div>
+<div class="card"><div class="label">สตรีค</div><div id="streak" class="value">0</div></div></div></div>
+
+<section class="card"><div class="title">📊 Roadmap ล่าสุด</div><div id="road" class="road"></div><div class="small" id="count"></div></section>
+<section class="two"><div class="card"><div class="title">🧠 AI Signal</div><div id="signal" class="signal">รอข้อมูล</div><div id="confidence">-</div><div class="meter"><div id="fill" class="fill"></div></div><div class="small">ประเมินจากสถิติย้อนหลัง ไม่ใช่การทำนายผลจริง</div></div>
+<div class="card"><div class="title">📈 สถิติ</div><div class="row"><span>Banker</span><b id="bp">0%</b></div><div class="row"><span>Player</span><b id="pp">0%</b></div><div class="row"><span>Tie</span><b id="tp">0%</b></div><div class="row"><span>ตัวอย่างที่ใช้</span><b id="window">20</b></div></div></section>
+
+<section class="card"><div class="title">🎯 บันทึกผล</div><div class="controls"><button class="btn b" onclick="add('B')">BANKER</button><button class="btn p" onclick="add('P')">PLAYER</button><button class="btn t" onclick="add('T')">TIE</button></div>
+<div class="controls" style="margin-top:8px"><button class="btn" onclick="undo()">↩ ย้อนกลับ</button><button class="btn danger" onclick="clearRound()">🗑 ล้างรอบ</button><button class="btn warn" onclick="newSession()">🔄 รอบใหม่</button></div></section>
+
+<section class="card"><div class="title">⚙️ การจัดการเงิน / เป้าหมาย</div><div class="settings">
+<label class="small">ทุนเริ่มต้น<input id="start" type="number" value="1000" onchange="save()"></label>
+<label class="small">เดิมพันต่อไม้<input id="stake" type="number" value="10" onchange="save()"></label>
+<label class="small">Stop Loss<input id="sl" type="number" value="100" onchange="save()"></label>
+<label class="small">Take Profit<input id="tpSet" type="number" value="200" onchange="save()"></label>
+</div><div class="row"><span>สถานะเป้าหมาย</span><b id="riskState">ปกติ</b></div></section>
+
+<section class="card"><div class="title">🧪 Backtest แบบเร็วจากข้อมูลที่บันทึก</div><div class="small">จำลองสัญญาณจากกติกาเดียวกับ AI Signal เพื่อดูผลย้อนหลัง ไม่ใช่การรับประกันอนาคต</div>
+<div class="controls" style="margin-top:8px"><button class="btn" onclick="backtest(10)">10 ไม้</button><button class="btn" onclick="backtest(20)">20 ไม้</button><button class="btn" onclick="backtest(50)">50 ไม้</button></div><div id="bt" class="row"></div></section>
+
+<section class="card"><div class="title">💾 ข้อมูล</div><div class="controls"><button class="btn" onclick="exportData()">Export JSON</button><button class="btn" onclick="document.getElementById('imp').click()">Import JSON</button><button class="btn" onclick="resetAll()">รีเซ็ตทั้งหมด</button></div><input id="imp" type="file" accept=".json" style="display:none" onchange="importData(event)"></section>
+<div class="footer">Baccarat AI GPT V9 • ใช้เพื่อบันทึกและวิเคราะห์สถิติเท่านั้น</div>
+</div>
+<script>
+const KEY='baccarat_ai_v9_max';
+let s=JSON.parse(localStorage.getItem(KEY)||'null')||{h:[],start:1000,stake:10,sl:100,tp:200,session:1,pl:0,w:0,l:0};
+function save(){s.start=+start.value||1000;s.stake=+stake.value||10;s.sl=+sl.value||100;s.tp=+tpSet.value||200;localStorage.setItem(KEY,JSON.stringify(s));render()}
+function persist(){localStorage.setItem(KEY,JSON.stringify(s));render()}
+function add(x){s.h.push(x);calc();persist()}
+function undo(){s.h.pop();calc();persist()}
+function clearRound(){s.h=[];s.pl=0;s.w=0;s.l=0;persist()}
+function newSession(){s.h=[];s.pl=0;s.w=0;s.l=0;s.session++;persist()}
+function calc(){let win=0,loss=0,pl=0;for(let i=0;i<s.h.length;i++){let sig=signalAt(s.h.slice(0,i));if(!sig||s.h[i]=='T')continue;if(sig===s.h[i]){win++;pl+=s.stake*(sig==='B'?.95:1)}else{loss++;pl-=s.stake}}s.w=win;s.l=loss;s.pl=pl}
+function signalAt(a){let q=a.filter(x=>x!='T');if(q.length<5)return null;let n=Math.min(20,q.length),z=q.slice(-n),b=z.filter(x=>x==='B').length,p=z.length-b;let last=z[z.length-1];if(last==='B')p+=1.5;else b+=1.5;return b>=p?'B':'P'}
+function render(){start.value=s.start;stake.value=s.stake;sl.value=s.sl;tpSet.value=s.tp;let h=s.h, n=Math.min(20,h.length),z=h.slice(-n),b=z.filter(x=>x==='B').length,p=z.filter(x=>x==='P').length,t=z.filter(x=>x==='T').length,total=z.length;
+road.innerHTML=h.slice(-40).map(x=>`<span class="ball ${x}">${x}</span>`).join('')||'<span class="small">ยังไม่มีข้อมูล</span>';count.textContent=`ทั้งหมด ${h.length} ไม้ • Session ${s.session}`;
+bank.textContent=(s.start+s.pl).toFixed(2);pl.textContent=(s.pl>=0?'+':'')+s.pl.toFixed(2);pl.className='value '+(s.pl>=0?'pos':'neg');
+wr.textContent=(s.w+s.l?((s.w/(s.w+s.l))*100).toFixed(1):0)+'%';let last=h[h.length-1],st=0;for(let i=h.length-1;i>=0&&h[i]===last;i--)st++;streak.textContent=st+(last?` ${last}`:'');
+bp.textContent=(total?(b/total*100).toFixed(1):0)+'%';pp.textContent=(total?(p/total*100).toFixed(1):0)+'%';tp.textContent=(total?(t/total*100).toFixed(1):0)+'%';window.textContent=total;
+let sig=signalAt(h);signal.textContent=sig?({B:'BANKER 🔴',P:'PLAYER 🔵'}[sig]):'รอข้อมูล';let q=h.filter(x=>x!='T').slice(-20),bb=q.filter(x=>x==='B').length,ppp=q.filter(x=>x==='P').length,conf=q.length?Math.max(bb,ppp)/q.length*100:0;confidence.textContent=sig?`Confidence ${conf.toFixed(1)}%`:'-';fill.style.width=Math.min(100,conf)+'%';
+let state=s.pl<=-s.sl?'🛑 STOP LOSS':s.pl>=s.tp?'🎯 TAKE PROFIT':'ปกติ';riskState.textContent=state}
+function backtest(k){let h=s.h.filter(x=>x!='T').slice(-k),w=0,l=0;if(h.length<6){bt.textContent='ข้อมูลไม่พอ (ต้องมีอย่างน้อย 6 ผล)';return}for(let i=5;i<h.length;i++){let sig=signalAt(h.slice(0,i));if(sig===h[i])w++;else l++}bt.innerHTML=`<span>ผลจำลอง ${k} ไม้: ชนะ <b>${w}</b> แพ้ <b>${l}</b> Accuracy <b>${((w/(w+l))*100).toFixed(1)}%</b></span>`}
+function exportData(){let blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`baccarat-ai-v9-session-${s.session}.json`;a.click()}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{s=JSON.parse(r.result);persist();alert('นำเข้าข้อมูลแล้ว')}catch{alert('ไฟล์ไม่ถูกต้อง')}};r.readAsText(f)}
+function resetAll(){if(confirm('รีเซ็ตข้อมูลทั้งหมด?')){s={h:[],start:1000,stake:10,sl:100,tp:200,session:1,pl:0,w:0,l:0};persist()}}
+render();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script></body></html>
